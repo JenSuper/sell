@@ -1,0 +1,19 @@
+
+logging:
+  file: F:\java\springboot\sell.log
+  pattern:
+    console: "%d - %msg%n"
+# 数据库连接信息
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://192.168.56.102:3306/sell?characterEncoding=utf-8&useSSL=false
+# 打印sql
+  jpa:
+    show-sql: true
+# 项目路径
+server:
+  context-path: /sell
+
