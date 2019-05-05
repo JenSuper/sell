@@ -1,4 +1,4 @@
-package com.jensuper.converter;
+package com.jensuper.sell.converter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
