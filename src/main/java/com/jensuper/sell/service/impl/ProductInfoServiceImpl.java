@@ -1,7 +1,7 @@
 package com.jensuper.sell.service.impl;
 
 import com.jensuper.sell.dto.CarDTO;
-import com.jensuper.sell.enums.OrderResultEnums;
+import com.jensuper.sell.enums.ResultEnums;
 import com.jensuper.sell.enums.ProductStatusEnums;
 import com.jensuper.sell.entity.ProductInfo;
 import com.jensuper.sell.exception.SellException;
@@ -68,7 +68,15 @@ public class ProductInfoServiceImpl implements ProductInfoService {
     @Override
     @Transactional
     public void increaseStock(List<CarDTO> carDTOList) {
+        for (CarDTO carDTO : carDTOList) {
+            //1. 查询商品详情
+            ProductInfo productInfo = productInfoRepository.findOne(carDTO.getProductId());
+            if (productInfo == null) {
+                throw new SellException(ResultEnums.PRODUCT_NOT_EXIT);
+            }
+            //2. 修改商品数量（数据库数量+购物车数量）
 
+        }
     }
 
     /**
@@ -84,13 +92,13 @@ public class ProductInfoServiceImpl implements ProductInfoService {
             //1.1 查询商品信息
             ProductInfo productInfo = productInfoRepository.findOne(carDTO.getProductId());
             if (productInfo == null) {//商品不存在，抛出异常
-                new SellException(OrderResultEnums.PRODUCT_NOT_EXIT);
+                new SellException(ResultEnums.PRODUCT_NOT_EXIT);
             }
 
             //1.2 判断库存是否足够:如果小于0，则抛出库存不足异常
             Integer num = productInfo.getProductStock() - carDTO.getAmount();
             if (num < 0) {
-                new SellException(OrderResultEnums.PRODUCT_STOCK_ERRO);
+                new SellException(ResultEnums.PRODUCT_STOCK_ERRO);
             }
 
             //1.3 更新商品库存

@@ -3,7 +3,7 @@ package com.jensuper.sell.controller;
 import com.jensuper.sell.converter.OrderForm2OrderDto;
 import com.jensuper.sell.VO.ResultVO;
 import com.jensuper.sell.dto.OrderDTO;
-import com.jensuper.sell.enums.OrderResultEnums;
+import com.jensuper.sell.enums.ResultEnums;
 import com.jensuper.sell.exception.SellException;
 import com.jensuper.sell.form.OrderForm;
 import com.jensuper.sell.service.OrderService;
@@ -27,20 +27,27 @@ public class BuyerOrderController {
     @Autowired
     private OrderService orderService;
 
-    //创建订单
+    /**
+     * 创建订单
+     * @param orderForm
+     * @param bindingResult
+     * @return
+     */
     public ResultVO create(@Valid OrderForm orderForm, BindingResult bindingResult) {
         //1. 参数验证
         if (bindingResult.hasErrors()) {
             log.error("【创建订单】参数错误，orderForm={}",orderForm);
-            throw new SellException(OrderResultEnums.PARAM_ERRO.getCode(),
+            throw new SellException(ResultEnums.PARAM_ERRO.getCode(),
                     bindingResult.getFieldError().getDefaultMessage());
         }
+
         //2. 参数实体类转换
         OrderDTO orderDTO = OrderForm2OrderDto.converter(orderForm);
         if (CollectionUtils.isEmpty(orderDTO.getOrderDetailList())) {
             log.error("【创建订单】购物车不能为空");
-            throw new SellException(OrderResultEnums.CART_EMPTY);
+            throw new SellException(ResultEnums.CART_EMPTY);
         }
+
         //3. 订单信息入库
         OrderDTO dtoRet = orderService.create(orderDTO);
 

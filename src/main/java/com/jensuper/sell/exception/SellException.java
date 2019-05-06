@@ -1,6 +1,6 @@
 package com.jensuper.sell.exception;
 
-import com.jensuper.sell.enums.OrderResultEnums;
+import com.jensuper.sell.enums.ResultEnums;
 
 /**
  * 订单异常处理
@@ -10,7 +10,7 @@ public class SellException extends RuntimeException {
     private Integer code;
     private String msg;
 
-    public SellException(OrderResultEnums orderResultEnums) {
+    public SellException(ResultEnums orderResultEnums) {
         super(orderResultEnums.getMsg());
         this.code = orderResultEnums.getCode();
     }

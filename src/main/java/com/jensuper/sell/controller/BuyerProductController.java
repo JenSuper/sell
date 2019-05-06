@@ -35,10 +35,13 @@ public class BuyerProductController {
     public ResultVO productListController() {
         // 1. 查询所有上架商品
         List<ProductInfo> productInfoList = productInfoService.findByProductStatus();
+
         // 1.1 所有商品类目
         List<Integer> categoryTypeList = productInfoList.stream().map(m -> m.getCategoryType()).collect(Collectors.toList());
+
         // 2. 查询商品类目
         List<ProductCategory> categoryList = productCategoryService.findByCategoryTypeIn(categoryTypeList);
+
         // 3. 拼接数据
         // 3.1 商品返回数据
         List<ProductVO> productVOList = new ArrayList<>();

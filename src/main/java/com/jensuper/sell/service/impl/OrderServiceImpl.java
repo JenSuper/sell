@@ -1,12 +1,13 @@
 package com.jensuper.sell.service.impl;
 
+import com.jensuper.sell.converter.OrderMaster2OrderDtoConverter;
 import com.jensuper.sell.dto.CarDTO;
 import com.jensuper.sell.dto.OrderDTO;
 import com.jensuper.sell.entity.OrderDetail;
 import com.jensuper.sell.entity.OrderMaster;
 import com.jensuper.sell.entity.ProductInfo;
 import com.jensuper.sell.enums.OrderPayStatusEnums;
-import com.jensuper.sell.enums.OrderResultEnums;
+import com.jensuper.sell.enums.ResultEnums;
 import com.jensuper.sell.enums.OrderStatusEnums;
 import com.jensuper.sell.exception.SellException;
 import com.jensuper.sell.repository.OrderDetailRepository;
@@ -14,6 +15,7 @@ import com.jensuper.sell.repository.OrderMatserRepository;
 import com.jensuper.sell.service.OrderService;
 import com.jensuper.sell.service.ProductInfoService;
 import com.jensuper.sell.unit.KeyUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -37,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderMatserRepository orderMatserRepository;
+
     /**
      * 生成订单
      * @param orderDto
@@ -54,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
             //1. 根据商品id查询商品信息
             ProductInfo product = productInfoService.findByProductId(orderDetail.getProductId());
             if (product == null) {
-                new SellException(OrderResultEnums.PRODUCT_NOT_EXIT);
+                new SellException(ResultEnums.PRODUCT_NOT_EXIT);
             }
             //2. 计算总价 (商品单价*数量)+总价<总价存放在订单表中，所以要得到所有商品的价格>
             amount = product.getProductPrice()
@@ -96,12 +100,12 @@ public class OrderServiceImpl implements OrderService {
         /* 1. 查询订单 */
         OrderMaster orderMaster = orderMatserRepository.findOne(orderId);
         if (orderMaster == null) {
-            throw new SellException(OrderResultEnums.ORDER_NOT_EXIT);
+            throw new SellException(ResultEnums.ORDER_NOT_EXIT);
         }
         /* 2. 查询订单详情 */
         List<OrderDetail> orderDetailList = orderDetailRepository.findByOrderId(orderId);
         if (CollectionUtils.isEmpty(orderDetailList)) {
-            throw new SellException(OrderResultEnums.ORDERDETAIL_NOT_EXIT);
+            throw new SellException(ResultEnums.ORDERDETAIL_NOT_EXIT);
         }
         /* 构建订单返回结果 */
         OrderDTO orderDTO = new OrderDTO();
@@ -111,13 +115,58 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    /**
+     * 查询订单列表
+     * 条件：用户id及分页条件
+     * @param buyerOpenid
+     * @param pageable
+     * @return
+     */
     @Override
     public List<OrderDTO> findAll(String buyerOpenid, Pageable pageable) {
-        return null;
+        List<OrderMaster> orderMasterList = orderMatserRepository.findAllByBuyerOpenid(buyerOpenid, pageable);
+        return OrderMaster2OrderDtoConverter.orderMasterList2OrderDtoConverter(orderMasterList);
     }
 
+    /**
+     * 取消订单
+     *   1）校验当前订单状态：必须是新创建的订单，则不能取消，抛异常
+     *   2）查询订单详情：如果为空则抛异常
+     *   3）修改订单状态为取消
+     *   3）如果订单是支付状态，需要退款
+     *   4）加库存
+     * @param orderDto
+     * @return
+     */
     @Override
+    @Transactional
     public OrderDTO cancel(OrderDTO orderDto) {
+        //必须是新订单，才可以取消订单
+        if (orderDto.getOrderStatus().equals(OrderStatusEnums.NEW.getCode())) {
+            log.error("【订单取消】订单状态异常，orderid = {}，orderstatus={}",orderDto.getOrderId(),orderDto.getOrderStatus());
+            throw new SellException(ResultEnums.ORDER_STATUS_ERRO);
+        }
+        //查询订单详情
+        orderDto.setOrderStatus(OrderStatusEnums.CANCEL.getCode());
+        OrderMaster orderMaster = new OrderMaster();
+        BeanUtils.copyProperties(orderDto, orderMaster);
+        OrderMaster masterRet = orderMatserRepository.save(orderMaster);
+        if (masterRet == null) {
+            log.error("【订单取消】订单状态修改失败");
+            throw new SellException(ResultEnums.ORDER_NOT_EXIT);
+        }
+        //判断是否需要减库存
+        List<OrderDetail> orderDetailList = orderDto.getOrderDetailList();
+        if ( CollectionUtils.isEmpty(orderDetailList)) {
+            log.error("【取消订单】订单中商品信息为空，orderdetail = {}",orderDetailList);
+            throw new SellException(ResultEnums.CART_EMPTY);
+        }
+        //如果已经付款，需要退款
+        if (orderDto.getPayStatus().equals(OrderPayStatusEnums.PAY_SUCCESS.getCode())) {
+            //TODO
+        }
+        //减库存
+
         return null;
     }
 
