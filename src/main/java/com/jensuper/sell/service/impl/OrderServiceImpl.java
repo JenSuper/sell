@@ -14,10 +14,12 @@ import com.jensuper.sell.repository.OrderDetailRepository;
 import com.jensuper.sell.repository.OrderMatserRepository;
 import com.jensuper.sell.service.OrderService;
 import com.jensuper.sell.service.ProductInfoService;
-import com.jensuper.sell.unit.KeyUnit;
+import com.jensuper.sell.util.KeyUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,8 +75,8 @@ public class OrderServiceImpl implements OrderService {
         }
         /* 将订单存入数据库（ordermaster ） */
         OrderMaster orderMaster = new OrderMaster();
+        orderDto.setOrderId(orderId);
         BeanUtils.copyProperties(orderDto,orderMaster);
-        orderMaster.setOrderId(orderId);
         orderMaster.setOrderAmount(amount);
         orderMaster.setOrderStatus(OrderStatusEnums.NEW.getCode());
         orderMaster.setPayStatus(OrderPayStatusEnums.PAY_OFF.getCode());
@@ -123,9 +125,10 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
-    public List<OrderDTO> findAll(String buyerOpenid, Pageable pageable) {
-        List<OrderMaster> orderMasterList = orderMatserRepository.findAllByBuyerOpenid(buyerOpenid, pageable);
-        return OrderMaster2OrderDtoConverter.orderMasterList2OrderDtoConverter(orderMasterList);
+    public Page<OrderDTO> findList(String buyerOpenid, Pageable pageable) {
+        Page<OrderMaster> orderMasterPage = orderMatserRepository.findAllByBuyerOpenid(buyerOpenid, pageable);
+        List<OrderDTO> orderDTOList = OrderMaster2OrderDtoConverter.orderMasterList2OrderDtoConverter(orderMasterPage.getContent());
+        return new PageImpl<>(orderDTOList,pageable,orderMasterPage.getTotalElements());
     }
 
     /**
@@ -182,6 +185,7 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
+    @Transactional
     public OrderDTO finsh(OrderDTO orderDto) {
         //如果不是新订单，抛出异常
         if (!orderDto.getOrderStatus().equals(OrderStatusEnums.NEW.getCode())) {

@@ -1,9 +1,8 @@
 package com.jensuper.sell.service;
 
 import com.jensuper.sell.dto.OrderDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface OrderService {
 
@@ -22,7 +21,7 @@ public interface OrderService {
      * 查询订单列表
      * 买家openid 分页对象
      */
-    List<OrderDTO> findAll(String buyerOpenid, Pageable pageable);
+    Page<OrderDTO> findList(String buyerOpenid, Pageable pageable);
 
     /**
      * 取消订单

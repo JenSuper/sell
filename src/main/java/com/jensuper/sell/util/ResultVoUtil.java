@@ -1,4 +1,4 @@
-package com.jensuper.sell.unit;
+package com.jensuper.sell.util;
 
 import com.jensuper.sell.VO.ResultVO;
 

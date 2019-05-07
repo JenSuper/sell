@@ -1,4 +1,4 @@
-package com.jensuper.sell.unit;
+package com.jensuper.sell.util;
 
 import java.util.Random;
 

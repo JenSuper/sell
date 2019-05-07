@@ -1,6 +1,8 @@
 package com.jensuper.sell.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.jensuper.sell.entity.OrderDetail;
+import com.jensuper.sell.util.serializer.Date2LongSerializeJson;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -18,7 +20,9 @@ public class OrderDTO {
     private BigDecimal orderAmount;//订单金额
     private Integer orderStatus;//订单状态，默认为新下单
     private Integer payStatus;//支付状态，默认未支付
+    @JsonSerialize(using = Date2LongSerializeJson.class)
     private Date createTime;//创建时间
+    @JsonSerialize(using = Date2LongSerializeJson.class)
     private Date updateTime;//修改时间
 
     List<OrderDetail> orderDetailList;
