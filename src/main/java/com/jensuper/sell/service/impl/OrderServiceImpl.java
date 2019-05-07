@@ -142,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDTO cancel(OrderDTO orderDto) {
         //必须是新订单，才可以取消订单
-        if (orderDto.getOrderStatus().equals(OrderStatusEnums.NEW.getCode())) {
+        if (!orderDto.getOrderStatus().equals(OrderStatusEnums.NEW.getCode())) {
             log.error("【订单取消】订单状态异常，orderid = {}，orderstatus={}",orderDto.getOrderId(),orderDto.getOrderStatus());
             throw new SellException(ResultEnums.ORDER_STATUS_ERRO);
         }
@@ -165,18 +165,73 @@ public class OrderServiceImpl implements OrderService {
         if (orderDto.getPayStatus().equals(OrderPayStatusEnums.PAY_SUCCESS.getCode())) {
             //TODO
         }
-        //减库存
 
-        return null;
+        //加库存
+        List<CarDTO> carDTOList = orderDetailList.stream().map(e-> new CarDTO(e.getProductId(),e.getProductQuantity()))
+                .collect(Collectors.toList());
+        productInfoService.increaseStock(carDTOList);
+
+        return orderDto;
     }
 
+    /**
+     * 订单完成
+     *  1）判断订单状态，如果不是新订单，则抛异常
+     *  2）修改订单状态为完结
+     * @param orderDto
+     * @return
+     */
     @Override
     public OrderDTO finsh(OrderDTO orderDto) {
-        return null;
+        //如果不是新订单，抛出异常
+        if (!orderDto.getOrderStatus().equals(OrderStatusEnums.NEW.getCode())) {
+            log.error("【订单完成】订单状态异常，orderStatus={}",orderDto.getOrderStatus());
+            throw new SellException(ResultEnums.ORDER_STATUS_ERRO);
+        }
+        //修改订单状态
+        orderDto.setOrderStatus(OrderStatusEnums.FINSH.getCode());
+        OrderMaster orderMaster = new OrderMaster();
+        BeanUtils.copyProperties(orderDto, orderMaster);
+        OrderMaster orderMasterResult = orderMatserRepository.save(orderMaster);
+
+        if (orderMasterResult == null) {
+            log.error("【订单完成】修改订单状态失败，orderStatus = {}",orderDto.getOrderStatus());
+            throw new SellException(ResultEnums.ORDER_UPDATE_FAIL);
+        }
+        return orderDto;
     }
 
+    /**
+     * 5.订单支付
+     * 	1）判断订单状态，必须是新订单才能支付
+     * 	2）判断订单支付状态，必须是未支付状态才可以修改
+     * 	3）修改订单支付状态
+     * @param orderDto
+     * @return
+     */
     @Override
     public OrderDTO pay(OrderDTO orderDto) {
-        return null;
+        //1. 判断订单状态
+        if (!orderDto.getOrderStatus().equals(OrderStatusEnums.NEW.getCode())) {
+            log.error("【订单支付】订单状态异常，orderStatus={}",orderDto.getOrderStatus());
+            throw new SellException(ResultEnums.ORDER_STATUS_ERRO);
+        }
+
+        //2.判断订单支付状态
+        if (!orderDto.getPayStatus().equals(OrderPayStatusEnums.PAY_OFF.getCode())) {
+            log.error("【订单支付】订单支付状态异常，orderPayStatus={}",orderDto.getPayStatus());
+            throw new SellException(ResultEnums.ORDER_PAY_ERROR);
+        }
+
+        //3.修改订单支付状态
+        orderDto.setPayStatus(OrderPayStatusEnums.PAY_SUCCESS.getCode());
+        OrderMaster orderMaster = new OrderMaster();
+        BeanUtils.copyProperties(orderDto, orderMaster);
+        OrderMaster orderMasterResult = orderMatserRepository.save(orderMaster);
+        if (orderMasterResult == null) {
+            log.error("【订单支付】订单支付状态更新失败，orderPayStatus = {}",orderDto.getPayStatus());
+            throw new SellException(ResultEnums.ORDER_PAY_UPDATE_FAIL);
+        }
+        return orderDto;
     }
 }

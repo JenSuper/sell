@@ -12,11 +12,14 @@ public enum ResultEnums {
     PRODUCT_NOT_EXIT(10,"商品不存在"),
     PRODUCT_STOCK_ERRO(11,"库存异常"),
 
-    ORDER_NOT_EXIT(12,"订单不存在"),
-    ORDERDETAIL_NOT_EXIT(13,"订单详情不存在"),
-    ORDER_STATUS_ERRO(14,"订单状态异常"),
+    CART_EMPTY(12,"购物车为空"),
 
-    CART_EMPTY(15,"购物车为空"),
+    ORDER_NOT_EXIT(13,"订单不存在"),
+    ORDERDETAIL_NOT_EXIT(14,"订单详情不存在"),
+    ORDER_STATUS_ERRO(15,"订单状态异常"),
+    ORDER_UPDATE_FAIL(16,"修改订单失败"),
+    ORDER_PAY_ERROR(17,"订单支付状态异常"),
+    ORDER_PAY_UPDATE_FAIL(18,"订单支付状态更新失败")
     ;
     private Integer code;
     private String msg;

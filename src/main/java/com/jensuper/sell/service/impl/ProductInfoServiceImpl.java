@@ -75,7 +75,9 @@ public class ProductInfoServiceImpl implements ProductInfoService {
                 throw new SellException(ResultEnums.PRODUCT_NOT_EXIT);
             }
             //2. 修改商品数量（数据库数量+购物车数量）
-
+            Integer num = carDTO.getAmount() + productInfo.getProductStock();
+            productInfo.setProductStock(num);
+            productInfoRepository.save(productInfo);
         }
     }
 
