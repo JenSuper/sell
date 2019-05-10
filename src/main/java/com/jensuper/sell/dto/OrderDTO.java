@@ -1,5 +1,6 @@
 package com.jensuper.sell.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.jensuper.sell.entity.OrderDetail;
 import com.jensuper.sell.util.serializer.Date2LongSerializeJson;
@@ -24,6 +25,6 @@ public class OrderDTO {
     private Date createTime;//创建时间
     @JsonSerialize(using = Date2LongSerializeJson.class)
     private Date updateTime;//修改时间
-
+//    @JsonInclude(JsonInclude.Include.NON_EMPTY)//为空不返回
     List<OrderDetail> orderDetailList;
 }

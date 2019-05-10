@@ -3,9 +3,11 @@ package com.jensuper.sell.controller;
 import com.jensuper.sell.VO.ResultVO;
 import com.jensuper.sell.converter.OrderForm2OrderDto;
 import com.jensuper.sell.dto.OrderDTO;
+import com.jensuper.sell.entity.OrderDetail;
 import com.jensuper.sell.enums.ResultEnums;
 import com.jensuper.sell.exception.SellException;
 import com.jensuper.sell.form.OrderForm;
+import com.jensuper.sell.service.BuyerService;
 import com.jensuper.sell.service.OrderService;
 import com.jensuper.sell.util.ResultVoUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +21,16 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/buyer/order")
 @Slf4j
 public class BuyerOrderController {
+
+    @Autowired
+    private BuyerService buyerService;
 
     @Autowired
     private OrderService orderService;
@@ -72,15 +78,16 @@ public class BuyerOrderController {
      *  3）将orderDTO返回
      *  备注：日期返回格式：秒
      *        需要将日期序列化，通过JsonSerialize注解实现
+     *        字段为空不返回
      * @param openid
      * @param page
      * @param size
      * @return
      */
     @GetMapping("/openid")
-    public ResultVO list(@RequestParam String openid,
-                         @RequestParam(value = "page",defaultValue = "0") Integer page,
-                         @RequestParam(value = "size",defaultValue = "10") Integer size) {
+    public ResultVO<List<Page<OrderDTO>>> list(@RequestParam String openid,
+                                               @RequestParam(value = "page",defaultValue = "0") Integer page,
+                                               @RequestParam(value = "size",defaultValue = "10") Integer size) {
         if (StringUtils.isEmpty(openid)) {
             log.error("【查询订单列表】openid为空，openid={}",openid);
             throw new SellException(ResultEnums.PARAM_ERRO);
@@ -94,6 +101,46 @@ public class BuyerOrderController {
         //返回结果
         return ResultVoUtil.success(orderDTOPage.getContent());
     }
-    //订单详情
-    //取消订单
+
+    /**
+     * 3.查询订单详情
+     * 	入参：openid、orderid
+     * 	1）校验用户id和订单中用户id是否相同
+     * 	2）查询订单
+     * @param openid
+     * @param orderId
+     * @return
+     */
+    @GetMapping("/detail")
+    public ResultVO detail(@RequestParam("openid") String openid,
+                           @RequestParam("orderid") String orderId) {
+        if (StringUtils.isEmpty(openid)) {
+            log.error("【查询订单列表】openid为空，openid={}",openid);
+            throw new SellException(ResultEnums.PARAM_ERRO);
+        }
+        OrderDTO orderDTO = buyerService.findOrderOne(openid, orderId);
+       return ResultVoUtil.success(orderDTO);
+    }
+
+    /**
+     * 4.取消订单
+     * 	入参：openid orderId
+     * 	1）校验用户id和订单中用户id是否相同
+     * 	2) 如果订单不存在，抛异常
+     * 	2）取消订单
+     * @param openid
+     * @param orderId
+     * @return
+     */
+    @PostMapping("/cancel")
+    public ResultVO cancel(@RequestParam("openid") String openid,
+                           @RequestParam("orderid") String orderId) {
+        if (StringUtils.isEmpty(openid)) {
+            log.error("【取消订单】openid为空，openid={}",openid);
+            throw new SellException(ResultEnums.PARAM_ERRO);
+        }
+        buyerService.cancelOrder(openid, orderId);
+        return ResultVoUtil.success();
+    }
+
 }

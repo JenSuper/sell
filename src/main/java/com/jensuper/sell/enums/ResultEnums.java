@@ -19,7 +19,8 @@ public enum ResultEnums {
     ORDER_STATUS_ERRO(15,"订单状态异常"),
     ORDER_UPDATE_FAIL(16,"修改订单失败"),
     ORDER_PAY_ERROR(17,"订单支付状态异常"),
-    ORDER_PAY_UPDATE_FAIL(18,"订单支付状态更新失败")
+    ORDER_PAY_UPDATE_FAIL(18,"订单支付状态更新失败"),
+    ORDER_OWEN_ERROR(18,"订单支付状态更新失败"),
     ;
     private Integer code;
     private String msg;
