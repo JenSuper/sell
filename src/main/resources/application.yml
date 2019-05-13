@@ -13,7 +13,13 @@ spring:
 # 打印sql
   jpa:
     show-sql: true
+  jackson:
+    default-property-inclusion: non_null # 空字段不返回
 # 项目路径
 server:
   context-path: /sell
+# WeChat配置
+wechat:
+  AppId: wx5c03e8698267f02e
+  Secret: 74f0139cd49d10017c8be89f79277802
 
