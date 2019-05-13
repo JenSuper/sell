@@ -20,6 +20,6 @@ server:
   context-path: /sell
 # WeChat配置
 wechat:
-  AppId: wx5c03e8698267f02e
-  Secret: 74f0139cd49d10017c8be89f79277802
+  AppId: wx8447590ce9c87cea
+  Secret: 22c98709c97a22cba96340a21c54b3f8
 
