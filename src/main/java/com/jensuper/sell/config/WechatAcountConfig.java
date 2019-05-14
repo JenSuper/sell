@@ -18,8 +18,12 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "wechat")
-public class WechatConfig {
+public class WechatAcountConfig {
 
     private String AppId;
     private String Secret;
+
+    private String MchId;
+    private String MchKey;
+    private String NotifyUrl;
 }
