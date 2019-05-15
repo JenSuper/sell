@@ -2,15 +2,20 @@ package com.jensuper.sell.controller;
 
 import com.jensuper.sell.config.WeChatPayConfig;
 import com.jensuper.sell.dto.OrderDTO;
+import com.jensuper.sell.service.OrderPayService;
 import com.jensuper.sell.service.OrderService;
 import com.lly835.bestpay.enums.BestPayTypeEnum;
 import com.lly835.bestpay.model.PayRequest;
+import com.lly835.bestpay.model.PayResponse;
 import com.lly835.bestpay.service.impl.BestPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Map;
 
 /**
  * All rights Reserved, Designed By www.rongdasoft.com
@@ -29,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class WeChatPayController {
 
     @Autowired
-    private WeChatPayConfig weChatPayConfig;
+    private OrderPayService orderPayService;
 
     @Autowired
     private OrderService orderService;
@@ -44,21 +49,15 @@ public class WeChatPayController {
      * @return String
      */
     @RequestMapping("/create")
-    public String create(@RequestParam("orderId") String orderId,
-                       @RequestParam("returnUrl") String returnUrl) {
-        //1. 支付配置类
-        BestPayServiceImpl bestPayService = weChatPayConfig.payConfig();
-        //2. 订单
+    public ModelAndView create(@RequestParam("orderId") String orderId,
+                               @RequestParam("returnUrl") String returnUrl, Map<String,Object> map) {
+        //1.查询订单
         OrderDTO orderDTO = orderService.findOne(orderId);
-        //3. 支付参数
-        PayRequest payRequest = new PayRequest();
-        payRequest.setPayTypeEnum(BestPayTypeEnum.WXPAY_H5);
-        payRequest.setOrderId(orderId);
-        payRequest.setOrderName("微信公众账号支付订单");
-        payRequest.setOrderAmount(orderDTO.getOrderAmount().doubleValue());
-        payRequest.setOpenid(orderDTO.getBuyerOpenid());
-        bestPayService.pay(payRequest);
-
-        return "redirect:" + returnUrl;
+        //2.获取支付参数
+        PayResponse payResponse = orderPayService.orderPay(orderDTO);
+        //3.调用JSAPI掉起微信支付
+        map.put("payRespone", payResponse);
+        map.put("returnUrl", returnUrl);
+        return new ModelAndView("/pay/create", map);
     }
 }

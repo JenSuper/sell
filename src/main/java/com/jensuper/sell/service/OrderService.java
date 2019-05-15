@@ -17,12 +17,17 @@ public interface OrderService {
      */
     OrderDTO findOne(String orderId);
 
-
     /**
      * 查询订单列表
      * 买家openid 分页对象
      */
     Page<OrderDTO> findList(String buyerOpenid, Pageable pageable);
+
+    /**
+     * 查询所有订单列表
+     * 卖家订单查询
+     */
+    Page<OrderDTO> findList(Pageable pageable);
 
     /**
      * 取消订单
