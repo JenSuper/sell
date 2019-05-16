@@ -2,6 +2,8 @@ package com.jensuper.sell.VO;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 返回值
  * @param <T>
@@ -14,4 +16,5 @@ public class ResultVO<T> {
     private String msg;/* code码对应信息 */
 
     private T data;/* 返回的数据 */
+
 }

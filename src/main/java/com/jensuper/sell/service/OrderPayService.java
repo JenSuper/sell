@@ -2,6 +2,7 @@ package com.jensuper.sell.service;
 
 import com.jensuper.sell.dto.OrderDTO;
 import com.lly835.bestpay.model.PayResponse;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * All rights Reserved, Designed By www.rongdasoft.com
@@ -16,4 +17,6 @@ import com.lly835.bestpay.model.PayResponse;
  */
 public interface OrderPayService {
     PayResponse orderPay(OrderDTO orderDTO);
+
+    void wxNotify(String notifyData);
 }

@@ -3,7 +3,7 @@ package com.jensuper.sell.enums;
 import lombok.Getter;
 
 @Getter
-public enum OrderPayStatusEnums {
+public enum OrderPayStatusEnums implements CodeEnums{
     PAY_OFF(0,"待支付"),
     PAY_SUCCESS(1,"支付成功")
     ;

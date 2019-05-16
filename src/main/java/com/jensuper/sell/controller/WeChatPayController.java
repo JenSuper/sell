@@ -11,6 +11,7 @@ import com.lly835.bestpay.service.impl.BestPayServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -59,5 +60,20 @@ public class WeChatPayController {
         map.put("payRespone", payResponse);
         map.put("returnUrl", returnUrl);
         return new ModelAndView("/pay/create", map);
+    }
+
+    /**
+     * 微信异步通知
+     * 1. 处理通知
+     * 2.
+     * @param notifyData
+     * @return
+     */
+    @RequestMapping("/notify")
+    public ModelAndView wxNotify(@RequestBody String notifyData) {
+        //微信异步通知处理，修改订单状态
+        orderPayService.wxNotify(notifyData);
+        //返回处理结果
+        return new ModelAndView("/pay/success");
     }
 }

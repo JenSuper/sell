@@ -1,12 +1,15 @@
 package com.jensuper.demo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.jensuper.sell.VO.ResultVO;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class test {
-    public static void main(String[] args) {
+    public static void main123(String[] args) {
         List<vo> list = new ArrayList<>();
         List<Data> listRet = new ArrayList<>();
         list.add(new vo(1, "one", 0, 1));
@@ -51,6 +54,27 @@ public class test {
         } else if (vo.getLevel() == 4) {
             data.setFour(vo.getName());
         }
-
     }
+    
+   public static void main(String[] args) {
+//       Map<String, Object> map = new HashMap<>();
+//       map.put("code", 1);
+//       map.put("msg", "测试");
+//       map.put("data", "数据");
+       Gson gson = new Gson();
+//       System.out.println(gson.toJson(map));
+
+       ResultVO resultVO = new ResultVO<>();
+       resultVO.setCode(1);
+       resultVO.setMsg("msg");
+       resultVO.setData("data");
+
+
+       Gson gsonP = new GsonBuilder().create();
+       String s = gsonP.toJson(resultVO);
+       System.out.println(s);
+       ResultVO vo = gson.fromJson(s, new TypeToken<ResultVO>() {
+       }.getType());
+       System.out.println(vo);
+   }
 }
