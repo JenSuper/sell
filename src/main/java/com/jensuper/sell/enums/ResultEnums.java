@@ -21,7 +21,10 @@ public enum ResultEnums {
     ORDER_PAY_ERROR(17,"订单支付状态异常"),
     ORDER_PAY_UPDATE_FAIL(18,"订单支付状态更新失败"),
     ORDER_OWEN_ERROR(19,"订单支付状态更新失败"),
-    WX_ORDER_MONEY_DIFF(20,"微信通知金额与订单进度不相同"),
+    WX_ORDER_MONEY_DIFF(20,"微信通知金额与订单金额不相同"),
+
+    ORDER_CANCEL_SUCCESS(21, "订单取消成功"),
+    ORDER_FINSH_SUCCESS(22, "订单完结成功"),
     ;
     private Integer code;
     private String msg;
