@@ -7,6 +7,7 @@ import com.jensuper.sell.entity.ProductInfo;
 import com.jensuper.sell.exception.SellException;
 import com.jensuper.sell.repository.ProductInfoRepository;
 import com.jensuper.sell.service.ProductInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ProductInfoServiceImpl implements ProductInfoService {
 
     @Autowired
@@ -50,8 +52,7 @@ public class ProductInfoServiceImpl implements ProductInfoService {
      * @return
      */
     @Override
-    public Page<ProductInfo> findProductAll() {
-        Pageable pageable = new PageRequest(0, 2);
+    public Page<ProductInfo> findProductAll(Pageable pageable) {
         return productInfoRepository.findAll(pageable);
     }
 
@@ -107,5 +108,51 @@ public class ProductInfoServiceImpl implements ProductInfoService {
             productInfo.setProductStock(num);
             productInfoRepository.save(productInfo);
         }
+    }
+
+    /**
+     * 商品上架
+     * 1. 查询商品是否存在
+     * 2. 判断商品状态是否为上架
+     * 3. 修改商品状态
+     * 4. 保存商品
+     * @param orderId
+     * @return
+     */
+    @Override
+    public ProductInfo onSale(String orderId) {
+        ProductInfo productInfo = productInfoRepository.findOne(orderId);
+        if (productInfo == null) {
+            log.error("【商品上架】查询不到订单,orderId = {}",orderId);
+            throw new SellException(ResultEnums.PRODUCT_NOT_EXIT);
+        }
+        //判断商品状态
+        if (productInfo.getProductStatus().equals(ProductStatusEnums.UP.getCode())) {
+            log.error("【商品上架】商品状态异常，orderId = {}",orderId);
+            throw new SellException(ResultEnums.PRODUCT_STATUS_ERRO);
+        }
+        productInfo.setProductStatus(ProductStatusEnums.UP.getCode());
+        return productInfoRepository.save(productInfo);
+    }
+
+    /**
+     * 商品下架
+     * @param orderId
+     * @return
+     */
+    @Override
+    public ProductInfo offSale(String orderId) {
+        ProductInfo productInfo = productInfoRepository.findOne(orderId);
+        if (productInfo == null) {
+            log.error("【商品下架】查询不到订单,orderId = {}",orderId);
+            throw new SellException(ResultEnums.PRODUCT_NOT_EXIT);
+        }
+        //判断商品状态
+        if (productInfo.getProductStatus().equals(ProductStatusEnums.DOWN.getCode())) {
+            log.error("【商品下架】商品状态异常，orderId = {}",orderId);
+            throw new SellException(ResultEnums.PRODUCT_STATUS_ERRO);
+        }
+        productInfo.setProductStatus(ProductStatusEnums.DOWN.getCode());
+        return productInfoRepository.save(productInfo);
     }
 }

@@ -12,6 +12,7 @@ public enum ResultEnums {
     PRODUCT_NOT_EXIT(10,"商品不存在"),
     PRODUCT_STOCK_ERRO(11,"库存异常"),
 
+
     CART_EMPTY(12,"购物车为空"),
 
     ORDER_NOT_EXIT(13,"订单不存在"),
@@ -25,6 +26,9 @@ public enum ResultEnums {
 
     ORDER_CANCEL_SUCCESS(21, "订单取消成功"),
     ORDER_FINSH_SUCCESS(22, "订单完结成功"),
+
+    PRODUCT_STATUS_ERRO(23,"商品状态异常"),
+    PRODUCT_UPDATE_SUCCESS(24,"商品状态修改成功"),
     ;
     private Integer code;
     private String msg;

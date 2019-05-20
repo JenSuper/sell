@@ -1,5 +1,7 @@
 package com.jensuper.sell.entity;
 
+import com.jensuper.sell.enums.ProductStatusEnums;
+import com.jensuper.sell.util.EnumsUtil;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -30,5 +32,10 @@ public class ProductInfo {
     private Integer productStatus;
     /* 商品类目编号 */
     private Integer categoryType;
+
+    //获取code对应枚举
+    private ProductStatusEnums getProductStatusEnums() {
+        return EnumsUtil.getEnumsByCode(productStatus, ProductStatusEnums.class);
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.jensuper.sell.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.jensuper.sell.entity.OrderDetail;
@@ -35,17 +36,17 @@ public class OrderDTO {
      * 获取订单状态msg
      * @return
      */
-    private String getOrderStatusMsg() {
-        OrderStatusEnums orderStatusEnums = EnumsUtil.getEnumsByCode(orderStatus, OrderStatusEnums.class);
-        return orderStatusEnums.getMsg();
+    @JsonIgnore
+    private OrderStatusEnums getOrderStatusEnums() {
+        return EnumsUtil.getEnumsByCode(orderStatus, OrderStatusEnums.class);
     }
 
     /**
      * 获取订单支付状态
      * @return
      */
-    private String getPayStatusMsg() {
-        OrderPayStatusEnums orderPayStatusEnums = EnumsUtil.getEnumsByCode(payStatus, OrderPayStatusEnums.class);
-        return orderPayStatusEnums.getMsg();
+    @JsonIgnore
+    private OrderPayStatusEnums getOrderPayStatusEnums() {
+        return EnumsUtil.getEnumsByCode(payStatus, OrderPayStatusEnums.class);
     }
 }
