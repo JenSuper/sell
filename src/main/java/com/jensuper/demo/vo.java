@@ -1,5 +1,8 @@
 package com.jensuper.demo;
 
+import lombok.Data;
+
+@Data
 public class vo {
 
     private Integer id;

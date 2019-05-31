@@ -29,6 +29,10 @@ public enum ResultEnums {
 
     PRODUCT_STATUS_ERRO(23,"商品状态异常"),
     PRODUCT_UPDATE_SUCCESS(24,"商品状态修改成功"),
+    PRODUCT_INFO_UPDATE_SUCCESS(25,"商品信息修改成功"),
+
+    LOGIN_SUCCESS(26,"登录成功"),
+    LOGOUT_SUCCESS(27,"登出成功"),
     ;
     private Integer code;
     private String msg;

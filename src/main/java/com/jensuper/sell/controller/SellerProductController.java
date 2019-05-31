@@ -4,15 +4,19 @@ import com.jensuper.sell.entity.ProductCategory;
 import com.jensuper.sell.entity.ProductInfo;
 import com.jensuper.sell.enums.ResultEnums;
 import com.jensuper.sell.exception.SellException;
+import com.jensuper.sell.form.ProductForm;
 import com.jensuper.sell.service.OrderService;
 import com.jensuper.sell.service.ProductCategoryService;
 import com.jensuper.sell.service.ProductInfoService;
+import com.jensuper.sell.util.KeyUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -130,5 +134,44 @@ public class SellerProductController {
             map.put("productInfo", productInfo);
         }
         return new ModelAndView("/product/index", map);
+    }
+
+    /**
+     * 商品修改/新增
+     * @param productForm
+     * @return
+     */
+    @GetMapping("/save")
+    public ModelAndView save(ProductForm productForm, BindingResult bindingResult,
+                             Map<String, Object> map) {
+        //校验参数
+        if (bindingResult.hasErrors()) {
+            log.error("【商品修改、新增】参与异常");
+            map.put("msg", bindingResult.getFieldError().getDefaultMessage());
+            map.put("url", "/sell/seller/product/list");
+            return new ModelAndView("/common/error", map);
+        }
+
+        //修改商品
+        if (!StringUtils.isEmpty(productForm.getProductId())) {
+            ProductInfo productInfo = productInfoService.findByProductId(productForm.getProductId());
+            if (productInfo == null) {
+                log.error("【商品修改】商品不存在，productId = {}",productForm.getProductId());
+                map.put("msg", ResultEnums.PRODUCT_NOT_EXIT);
+                map.put("url", "/sell/seller/product/list");
+                return new ModelAndView("/common/error", map);
+            }
+            BeanUtils.copyProperties(productForm, productInfo);
+            productInfoService.saveProduct(productInfo);
+            map.put("msg", ResultEnums.PRODUCT_INFO_UPDATE_SUCCESS);
+            map.put("url", "/sell/seller/product/list");
+            return new ModelAndView("/common/success", map);
+        }
+        //新增商品
+        ProductInfo productInfo = new ProductInfo();
+        BeanUtils.copyProperties(productForm, productInfo);
+        productInfo.setProductId(KeyUnit.getUniqueKey());
+        productInfoService.saveProduct(productInfo);
+        return new ModelAndView("/product/list", map);
     }
 }

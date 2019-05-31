@@ -2,11 +2,18 @@ package com.jensuper.demo;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.jensuper.sell.VO.ResultVO;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static jdk.nashorn.internal.objects.Global.print;
 
 public class test {
     public static void main123(String[] args) {
@@ -20,18 +27,18 @@ public class test {
         list.add(new vo(6, "four_1", 5, 4));
         Collections.reverse(list);
 
-        List<vo> voList = list.stream().filter(e -> e.getLevel()==4).collect(Collectors.toList());
+        List<vo> voList = list.stream().filter(e -> e.getLevel() == 4).collect(Collectors.toList());
         Data data = new Data();
         for (vo vo : voList) {
-            data  = new Data();
+            data = new Data();
             data.setFour(vo.getName());
-            getChild(vo, list, listRet,data);
+            getChild(vo, list, listRet, data);
         }
         System.out.println(listRet);
     }
 
-    private static void getChild(vo currentVo, List<vo> listAll, List<Data> listRet,Data data) {
-        if (currentVo.getLevel()==1) {
+    private static void getChild(vo currentVo, List<vo> listAll, List<Data> listRet, Data data) {
+        if (currentVo.getLevel() == 1) {
             set(data, currentVo);
             listRet.add(data);
             return;
@@ -39,7 +46,7 @@ public class test {
         for (vo voall : listAll) {
             if (currentVo.getPid() == voall.getId()) {
                 set(data, voall);
-                getChild(voall, listAll, listRet,data);
+                getChild(voall, listAll, listRet, data);
             }
         }
     }
@@ -55,26 +62,63 @@ public class test {
             data.setFour(vo.getName());
         }
     }
-    
-   public static void main(String[] args) {
+
+    public static void main(String[] args) {
 //       Map<String, Object> map = new HashMap<>();
 //       map.put("code", 1);
 //       map.put("msg", "测试");
 //       map.put("data", "数据");
-       Gson gson = new Gson();
+        Gson gson = new Gson();
 //       System.out.println(gson.toJson(map));
 
-       ResultVO resultVO = new ResultVO<>();
-       resultVO.setCode(1);
-       resultVO.setMsg("msg");
-       resultVO.setData("data");
+        ResultVO resultVO = new ResultVO<>();
+        resultVO.setCode(1);
+        resultVO.setMsg("msg");
+        resultVO.setData("data");
 
 
-       Gson gsonP = new GsonBuilder().create();
-       String s = gsonP.toJson(resultVO);
-       System.out.println(s);
-       ResultVO vo = gson.fromJson(s, new TypeToken<ResultVO>() {
-       }.getType());
-       System.out.println(vo);
-   }
+        Gson gsonP = new GsonBuilder().create();
+        String s = gsonP.toJson(resultVO);
+        System.out.println(s);
+        ResultVO vo = gson.fromJson(s, new TypeToken<ResultVO>() {
+        }.getType());
+
+        System.out.println(vo);
+    }
+
+    @Test
+    public void test() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Map<String, Object> mapJson = new HashMap<>();
+//       vo vo = new vo(1, "小米", 2, 3);
+//       map.put("data", vo);
+
+        List<String> list = new ArrayList<>();
+        mapJson.put("list", list);
+
+        for (String key : mapJson.keySet()) {
+            String value = String.valueOf(mapJson.get(key));
+            if (StringUtils.isNotEmpty(value)) {
+                System.out.println(123);
+            }
+        }
+
+        String json = gson.toJson(mapJson);
+        System.out.println(json);
+    }
+
+    @Test
+    public void test1() {
+
+//        List<vo> list = new ArrayList<>();
+//        vo vo = new vo(1, "小米", 2, 3);
+//        vo vo2 = new vo(1, "小米2", 2, 3);
+//        list.add(vo);
+//        list.add(vo2);
+        Integer a = 12;
+        String b = "12";
+        System.out.println(a.toString().equals(b));
+    }
+
 }
